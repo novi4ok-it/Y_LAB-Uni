@@ -4,10 +4,11 @@ import by.yakovlevpavel.habittracker.model.Habit;
 import by.yakovlevpavel.habittracker.model.HabitRecord;
 import by.yakovlevpavel.habittracker.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HabitService {
     private static Map<Integer, Habit> habits = new HashMap<>();
@@ -37,14 +38,12 @@ public class HabitService {
     public void deleteHabit(int habitId) {
         habits.remove(habitId);
     }
+
     public List<Habit> getHabitsByUserId(int userId) {
-        List<Habit> habitsOfThisUser = new ArrayList<>();
-        for (Map.Entry<Integer, Habit> entry : habits.entrySet()) {
-            Habit value = entry.getValue();
-            if (value.getUserId() == userId) {
-                habitsOfThisUser.add(value);
-            }
-        }
+        List<Habit> habitsOfThisUser = new ArrayList<>(habits.values());
+        habitsOfThisUser.removeIf(habit -> habit.getUserId() != userId);
+        habitsOfThisUser.sort(Comparator.comparing(Habit::getDate));
+
         return habitsOfThisUser;
     }
 
@@ -63,5 +62,54 @@ public class HabitService {
         return habitRecords.getOrDefault(habitId, new ArrayList<>());
     }
 
+    public int getCompletionRateForPeriodForThisHabit(int habitId, LocalDate start, LocalDate end) {
+        List<HabitRecord> records = getHabitRecordsByHabitId(habitId);
+        List<Date> dates = records.stream()
+                .map(HabitRecord::getDate)
+                .toList();
 
+        if (dates.isEmpty()) {
+            return 0;
+        }
+
+        long daysInPeriod = ChronoUnit.DAYS.between(start, end) + 1;
+        int completedDays = 0;
+
+        for (Date date : dates) {
+            LocalDate recordDate = LocalDate.ofInstant(date.toInstant(), ZoneId.systemDefault());
+            if (recordDate.isAfter(start.minusDays(1)) && recordDate.isBefore(end.plusDays(1))) {
+                completedDays++;
+            }
+        }
+        //nagovnocodil, sorry <3
+        return (int) Math.round(((double) completedDays / daysInPeriod) * 100);
+    }
+
+    public int getCurrentStreakForHabit(int habitId) {
+        List<HabitRecord> records = getHabitRecordsByHabitId(habitId);
+        if (records.isEmpty()) {
+            return 0;
+        }
+
+        records.sort(Comparator.comparing(HabitRecord::getDate));
+
+        int currentStreak = 0;
+        LocalDate lastCompletedDate = null;
+
+        for (HabitRecord record : records) {
+            LocalDate recordDate = LocalDate.ofInstant(record.getDate().toInstant(), ZoneId.systemDefault());
+            if (record.isCompleted()) {
+                if (lastCompletedDate == null || recordDate.isEqual(lastCompletedDate.plusDays(1))) {
+                    currentStreak++;
+                    lastCompletedDate = recordDate;
+                } else {
+                    currentStreak = 1;
+                    lastCompletedDate = recordDate;
+                }
+            } else {
+                currentStreak = 0;
+            }
+        }
+        return currentStreak;
+    }
 }

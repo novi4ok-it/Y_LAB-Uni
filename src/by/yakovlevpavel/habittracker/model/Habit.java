@@ -1,17 +1,21 @@
 package by.yakovlevpavel.habittracker.model;
 
+import java.util.Date;
+
 public class Habit {
     private int id;
     private String name;
     private String description;
     private String frequency;
+    private Date date;
     private int userId;
 
-    public Habit(String name, String description, String frequency, int userId) {
+    public Habit(String name, String description, String frequency, Date date, int userId) {
         this.name = name;
         this.description = description;
         this.frequency = frequency;
         this.userId = userId;
+        this.date = date;
     }
 
     public int getId() {
@@ -44,6 +48,13 @@ public class Habit {
 
     public void setFrequency(String frequency) {
         this.frequency = frequency;
+    }
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public int getUserId() {
