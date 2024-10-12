@@ -2,13 +2,11 @@ package by.yakovlevpavel.habittracker.service;
 
 import by.yakovlevpavel.habittracker.model.Habit;
 import by.yakovlevpavel.habittracker.model.HabitRecord;
-import by.yakovlevpavel.habittracker.model.User;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class HabitService {
     private static Map<Integer, Habit> habits = new HashMap<>();
@@ -23,11 +21,11 @@ public class HabitService {
         return habit;
     }
 
-    public Habit getHabitById(int habitId) {
+    public static Habit getHabitById(int habitId) {
         return habits.get(habitId);
     }
 
-    public void updateHabit(Habit habit) {
+    public static void updateHabit(Habit habit) {
         if (habits.containsKey(habit.getId())) {
             habits.put(habit.getId(), habit);
         } else {
@@ -39,7 +37,7 @@ public class HabitService {
         habits.remove(habitId);
     }
 
-    public List<Habit> getHabitsByUserId(int userId) {
+    public static List<Habit> getHabitsByUserId(int userId) {
         List<Habit> habitsOfThisUser = new ArrayList<>(habits.values());
         habitsOfThisUser.removeIf(habit -> habit.getUserId() != userId);
         habitsOfThisUser.sort(Comparator.comparing(Habit::getDate));
@@ -111,5 +109,8 @@ public class HabitService {
             }
         }
         return currentStreak;
+    }
+    public Map<Integer, Habit> getAllHabits() {
+        return habits;
     }
 }

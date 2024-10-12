@@ -12,7 +12,7 @@ public class UserService {
     private static List<String> usersEmail = new ArrayList<>();
     private static List<String> usersPasswords = new ArrayList<>();
     private static int userCounter = 0;
-
+    private static Map<Integer, Boolean> blockedUsers = new HashMap<>();
     public User createUser(User user) {
         if (usersEmail.contains(user.getEmail())) {
             throw new IllegalArgumentException("Пользователь с таким email уже существует.");
@@ -40,5 +40,18 @@ public class UserService {
         else {
             return;
         }
+    }
+    public void blockUser(int userId) {
+        blockedUsers.put(userId, true);
+    }
+
+    // Метод для разблокировки пользователя
+    public void unblockUser(int userId) {
+        blockedUsers.remove(userId);
+    }
+
+    // Метод для проверки блокировки пользователя
+    public boolean isUserBlocked(int userId) {
+        return blockedUsers.getOrDefault(userId, false);
     }
 }
