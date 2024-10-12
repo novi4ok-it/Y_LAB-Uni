@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class HabitController {
 
-    private static final HabitService habitService = new HabitService();
+    public static final HabitService habitService = new HabitService();
 
     public static Habit createHabit(String name, String description, String frequency, Date date, int userId) {
         Habit habit = new Habit(name, description, frequency, date, userId);

@@ -9,9 +9,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class HabitService {
-    private static Map<Integer, Habit> habits = new HashMap<>();
+    private static final Map<Integer, Habit> habits = new HashMap<>();
     private static int habitsCounter = 0;
-    private static Map<Integer, List<HabitRecord>> habitRecords = new HashMap<>();
+    private static final Map<Integer, List<HabitRecord>> habitRecords = new HashMap<>();
     private static int habitRecordCounter = 0;
 
     public Habit createHabit(Habit habit, int userId) {
@@ -45,7 +45,7 @@ public class HabitService {
         return habitsOfThisUser;
     }
 
-    public void createHabitRecord(HabitRecord habitRecord) {
+    public static void createHabitRecord(HabitRecord habitRecord) {
         if (habitRecords.containsKey(habitRecord.getHabitId())) {
             habitRecords.get(habitRecord.getHabitId()).add(habitRecord);
         } else {
@@ -56,11 +56,11 @@ public class HabitService {
         habitRecord.setId(habitRecordCounter++);
     }
 
-    public List<HabitRecord> getHabitRecordsByHabitId(int habitId) {
+    public static List<HabitRecord> getHabitRecordsByHabitId(int habitId) {
         return habitRecords.getOrDefault(habitId, new ArrayList<>());
     }
 
-    public int getCompletionRateForPeriodForThisHabit(int habitId, LocalDate start, LocalDate end) {
+    public static int getCompletionRateForPeriodForThisHabit(int habitId, Date start, Date end) {
         List<HabitRecord> records = getHabitRecordsByHabitId(habitId);
         List<Date> dates = records.stream()
                 .map(HabitRecord::getDate)
@@ -70,20 +70,22 @@ public class HabitService {
             return 0;
         }
 
-        long daysInPeriod = ChronoUnit.DAYS.between(start, end) + 1;
+        long daysInPeriod = ChronoUnit.DAYS.between(start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+                end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) + 1;
         int completedDays = 0;
 
         for (Date date : dates) {
-            LocalDate recordDate = LocalDate.ofInstant(date.toInstant(), ZoneId.systemDefault());
-            if (recordDate.isAfter(start.minusDays(1)) && recordDate.isBefore(end.plusDays(1))) {
+            LocalDate recordDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            if (recordDate.isAfter(start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().minusDays(1)) &&
+                    recordDate.isBefore(end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plusDays(1))) {
                 completedDays++;
             }
         }
-        //nagovnocodil, sorry <3
+
         return (int) Math.round(((double) completedDays / daysInPeriod) * 100);
     }
 
-    public int getCurrentStreakForHabit(int habitId) {
+    public static int getCurrentStreakForHabit(int habitId) {
         List<HabitRecord> records = getHabitRecordsByHabitId(habitId);
         if (records.isEmpty()) {
             return 0;

@@ -12,7 +12,10 @@ public class UserService {
     private static List<String> usersEmail = new ArrayList<>();
     private static List<String> usersPasswords = new ArrayList<>();
     private static int userCounter = 0;
-    private static Map<Integer, Boolean> blockedUsers = new HashMap<>();
+    private static Map<String, Boolean> blockedUsers = new HashMap<>();
+    public static Map<String, Boolean> getBlockedUsers() {
+        return blockedUsers;
+    }
     public User createUser(User user) {
         if (usersEmail.contains(user.getEmail())) {
             throw new IllegalArgumentException("Пользователь с таким email уже существует.");
@@ -41,17 +44,13 @@ public class UserService {
             return;
         }
     }
-    public void blockUser(int userId) {
-        blockedUsers.put(userId, true);
+    public void blockUser(String email) {
+        blockedUsers.put(email, true);
     }
-
-    // Метод для разблокировки пользователя
-    public void unblockUser(int userId) {
-        blockedUsers.remove(userId);
+    public void unblockUser(String email) {
+        blockedUsers.remove(email);
     }
-
-    // Метод для проверки блокировки пользователя
-    public boolean isUserBlocked(int userId) {
-        return blockedUsers.getOrDefault(userId, false);
+    public boolean isUserBlocked(String email) {
+        return blockedUsers.getOrDefault(email, false);
     }
 }
