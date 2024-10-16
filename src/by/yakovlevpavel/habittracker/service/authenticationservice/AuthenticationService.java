@@ -1,4 +1,4 @@
-package by.yakovlevpavel.habittracker.service;
+package by.yakovlevpavel.habittracker.service.authenticationservice;
 
 import by.yakovlevpavel.habittracker.model.User;
 import by.yakovlevpavel.habittracker.service.userservice.UserBlockedStatusService;

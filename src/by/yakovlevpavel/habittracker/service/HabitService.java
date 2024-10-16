@@ -8,10 +8,10 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-public class HabitService {
-    private static final Map<Integer, Habit> habits = new HashMap<>();
+public class HabitService { //тут я не стал мощно какать интерфейсами
+    private static Map<Integer, Habit> habits = new HashMap<>();
     private static int habitsCounter = 0;
-    private static final Map<Integer, List<HabitRecord>> habitRecords = new HashMap<>();
+    private static Map<Integer, List<HabitRecord>> habitRecords = new HashMap<>();
     private static int habitRecordCounter = 0;
 
     public Habit createHabit(Habit habit, int userId) {

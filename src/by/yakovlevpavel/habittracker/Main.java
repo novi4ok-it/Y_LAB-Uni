@@ -4,17 +4,25 @@ import by.yakovlevpavel.habittracker.controller.HabitController;
 import by.yakovlevpavel.habittracker.model.Habit;
 import by.yakovlevpavel.habittracker.model.HabitRecord;
 import by.yakovlevpavel.habittracker.model.User;
-import by.yakovlevpavel.habittracker.service.AuthenticationService;
+import by.yakovlevpavel.habittracker.service.authenticationservice.AuthenticationService;
 import by.yakovlevpavel.habittracker.service.HabitService;
+import by.yakovlevpavel.habittracker.service.userservice.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
-public class Main { //наговнокодил я конечно, извиняюсь
-    private static final AuthenticationService authenticationService = new AuthenticationService();
+public class Main {
+    static Map<Integer, User> users = new HashMap<>();
+    static Map<String, Boolean> blockedUsers = new HashMap<>();
+
+    static UserCreationService userCreationService = new UserCreationServiceImpl();
+    static UserRetrievalService userRetrievalService = new UserRetrievalServiceImpl(users);
+    static UserBlockedStatusService userBlockedStatusService = new UserBlockedStatusServiceImpl(blockedUsers);
+
+    // Создаем экземпляр AuthenticationService с инъекцией зависимостей
+    static AuthenticationService authenticationService = new AuthenticationService(
+            userCreationService, userRetrievalService, userBlockedStatusService);
     private static User currentUser;
 
     public static void main(String[] args) {
@@ -129,11 +137,11 @@ public class Main { //наговнокодил я конечно, извиняю
                 System.out.println("Вход выполнен успешно!");
             } else {
                 System.out.println("Неверный email или пароль.");
-                showLoginMenu(scanner); // Вызов showLoginMenu при ошибке
+                showLoginMenu(scanner);
             }
         } catch (Exception e) {
             System.out.println("Произошла ошибка при авторизации. Попробуйте снова.");
-            showLoginMenu(scanner); // Вызов showLoginMenu при ошибке
+            showLoginMenu(scanner);
         }
     }
     private static void createHabit(Scanner scanner) {
